@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
+import { API_ENDPOINTS } from '../config';
 function NavBar(props) {
   let location = useLocation();
   const handleLogout = () => {
@@ -20,7 +21,7 @@ function NavBar(props) {
       return;
     }
   
-    fetch(`${process.env.BACKEND_URL}/api/auth/deleteuser/${userId}`, {
+    fetch(`${API_ENDPOINTS.DELETE_USER}/${userId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

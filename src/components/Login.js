@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config';
 function Login(props) {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     let navigate = useNavigate();
     const hendalSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(`/api/auth/login`, {
+        const response = await fetch(API_ENDPOINTS.LOGIN, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

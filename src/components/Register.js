@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config';
 function Register(props) {
     const { showAlert } = props;
     const [credentials, setCredentials] = useState({ name: "", uname: "", email: "", password: "", cpassword: "" });
@@ -17,7 +18,7 @@ function Register(props) {
             return;
         }
         setSendingOtp(true);
-        const response = await fetch(`/api/auth/send-email-otp`, {
+        const response = await fetch(API_ENDPOINTS.SEND_EMAIL_OTP, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: credentials.email })
@@ -39,7 +40,7 @@ function Register(props) {
             return;
         }
         setVerifyingOtp(true);
-        const response = await fetch(`/api/auth/verify-email-otp`, {
+        const response = await fetch(API_ENDPOINTS.VERIFY_EMAIL_OTP, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: credentials.email, otp })
@@ -67,20 +68,31 @@ function Register(props) {
         }
         e.preventDefault();
         const { name, uname, email, password } = credentials;
-        const response = await fetch(`/api/auth/createuser`, {
+        const response = await fetch(API_ENDPOINTS.CREATE_USER, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ name, uname, email, password })
         });
+        
+        if (!response.ok) {
+            console.error("Registration failed with status:", response.status);
+            const errorData = await response.json();
+            console.error("Error data:", errorData);
+            showAlert(errorData.errors || errorData.error || `Registration failed (${response.status})`, "warning");
+            return;
+        }
+        
         const data = await response.json();
+        console.log("Registration response:", data);
         if (data.success) {
             navigate("/login");
             showAlert("account created successfully", "success");
         }
         else {
-            showAlert("please check your details", "warning");
+            console.error("Registration failed:", data);
+            showAlert(data.errors || data.error || "please check your details", "warning");
         }
     }
     const onChange = (e) => {
