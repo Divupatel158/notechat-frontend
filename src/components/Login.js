@@ -6,10 +6,7 @@ function Login(props) {
     let navigate = useNavigate();
     const hendalSubmit = async (e) => {
         e.preventDefault();
-
-
-        
-        const response = await fetch("http://localhost:5001/api/auth/login", {
+        const response = await fetch(`/api/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -19,12 +16,7 @@ function Login(props) {
                 password: credentials.password
             })
         });
-
-
-
-
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             localStorage.setItem("token", data.token);
             localStorage.setItem("uname", data.uname);

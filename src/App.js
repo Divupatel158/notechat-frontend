@@ -20,7 +20,7 @@ function App() {
       <NoteState>
         <Navbar showAlert={showAlert} />
         <Alert alert={alert} />
-        <div className="container">
+        <div className="container-fluid p-0">
           <Routes>
             {localStorage.getItem('token') ? <Route path="/" element={<Home showAlert={showAlert} />} /> : <Route path="/" element={<Login showAlert={showAlert} />} />}
             <Route path="/login" element={<Login showAlert={showAlert} />} />

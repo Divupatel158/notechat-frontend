@@ -3,24 +3,78 @@ import { useNavigate, NavLink } from 'react-router-dom';
 function Register(props) {
     const { showAlert } = props;
     const [credentials, setCredentials] = useState({ name: "", uname: "", email: "", password: "", cpassword: "" });
+    const [otp, setOtp] = useState("");
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpVerified, setOtpVerified] = useState(false);
+    const [sendingOtp, setSendingOtp] = useState(false);
+    const [verifyingOtp, setVerifyingOtp] = useState(false);
     let navigate = useNavigate();
+
+    const handleSendOtp = async (e) => {
+        e.preventDefault();
+        if (!credentials.email) {
+            showAlert("Please enter your email", "warning");
+            return;
+        }
+        setSendingOtp(true);
+        const response = await fetch(`${process.env.BACKEND_URL}/api/auth/send-email-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: credentials.email })
+        });
+        const data = await response.json();
+        setSendingOtp(false);
+        if (data.success) {
+            setOtpSent(true);
+            showAlert("OTP sent to your email", "success");
+        } else {
+            showAlert(data.error || "Failed to send OTP", "warning");
+        }
+    };
+
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        if (!otp) {
+            showAlert("Please enter the OTP", "warning");
+            return;
+        }
+        setVerifyingOtp(true);
+        const response = await fetch(`${process.env.BACKEND_URL}/api/auth/verify-email-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: credentials.email, otp })
+        });
+        const data = await response.json();
+        setVerifyingOtp(false);
+        if (data.success) {
+            setOtpVerified(true);
+            showAlert("OTP verified! You can now register.", "success");
+        } else {
+            showAlert(data.error || "OTP verification failed", "warning");
+        }
+    };
+
     const hendalSubmit = async (e) => {
         if (credentials.password !== credentials.cpassword) {
             alert("Passwords do not match");
             e.preventDefault();
             return false;
         }
+        if (!otpVerified) {
+            showAlert("Please verify OTP before registering", "warning");
+            e.preventDefault();
+            return false;
+        }
         e.preventDefault();
         const { name, uname, email, password } = credentials;
-        const response = await fetch("http://localhost:5001/api/auth/createuser", {
+        const response = await fetch(`${process.env.BACKEND_URL}/api/auth/createuser`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ name: name, uname: uname, email: email, password: password })
+            body: JSON.stringify({ name, uname, email, password })
         });
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             navigate("/login");
             showAlert("account created successfully", "success");
@@ -57,10 +111,20 @@ function Register(props) {
                                             </div>
                                             <div className="d-flex flex-row align-items-center mb-4">
                                                 <i className="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                                <div data-mdb-input-init className="form-outline flex-fill mb-0">
-                                                    <input type="email" id="email" className="form-control" name='email' placeholder='Enter your email' value={credentials.email} onChange={onChange} required />
+                                                <div data-mdb-input-init className="form-outline flex-fill mb-0 d-flex align-items-center">
+                                                    <input type="email" id="email" className="form-control" name='email' placeholder='Enter your email' value={credentials.email} onChange={onChange} required style={{maxWidth:'70%'}} />
+                                                    <button type="button" className="btn btn-outline-primary ms-2" onClick={handleSendOtp} disabled={sendingOtp || otpSent}>{sendingOtp ? 'Sending...' : otpSent ? 'OTP Sent' : 'Send OTP'}</button>
                                                 </div>
                                             </div>
+                                            {otpSent && (
+                                                <div className="d-flex flex-row align-items-center mb-4">
+                                                    <i className="fas fa-key fa-lg me-3 fa-fw"></i>
+                                                    <div data-mdb-input-init className="form-outline flex-fill mb-0 d-flex align-items-center">
+                                                        <input type="text" id="otp" className="form-control" name='otp' placeholder='Enter OTP' value={otp} onChange={e => setOtp(e.target.value)} required style={{maxWidth:'70%'}} />
+                                                        <button type="button" className="btn btn-outline-success ms-2" onClick={handleVerifyOtp} disabled={verifyingOtp || otpVerified}>{verifyingOtp ? 'Verifying...' : otpVerified ? 'Verified' : 'Verify OTP'}</button>
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className="d-flex flex-row align-items-center mb-4">
                                                 <i className="fas fa-lock fa-lg me-3 fa-fw"></i>
                                                 <div data-mdb-input-init className="form-outline flex-fill mb-0">
@@ -75,10 +139,9 @@ function Register(props) {
                                             </div>
                                             <div className="form-check d-flex justify-content-center mb-5">
                                                 you have already an account? <NavLink to="/login">Login</NavLink>
-
                                             </div>
                                             <div className="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                                <button type="submit" data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-lg">Register</button>
+                                                <button type="submit" data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-lg" disabled={!otpVerified}>Register</button>
                                             </div>
                                         </form>
                                     </div>

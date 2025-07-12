@@ -20,7 +20,7 @@ function NavBar(props) {
       return;
     }
   
-    fetch(`http://localhost:5001/api/auth/deleteuser/${userId}`, {
+    fetch(`${process.env.BACKEND_URL}/api/auth/deleteuser/${userId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,10 @@ function NavBar(props) {
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
-          <NavLink className="navbar-brand" to="/">NoteChat</NavLink>
+          <NavLink className="navbar-brand" to="/">
+            <i className="fas fa-comments me-2"></i>
+            ChatApp
+          </NavLink>
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
