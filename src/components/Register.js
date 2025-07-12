@@ -17,7 +17,7 @@ function Register(props) {
             return;
         }
         setSendingOtp(true);
-        const response = await fetch(`${process.env.BACKEND_URL}/api/auth/send-email-otp`, {
+        const response = await fetch(`/api/auth/send-email-otp`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: credentials.email })
@@ -39,7 +39,7 @@ function Register(props) {
             return;
         }
         setVerifyingOtp(true);
-        const response = await fetch(`${process.env.BACKEND_URL}/api/auth/verify-email-otp`, {
+        const response = await fetch(`/api/auth/verify-email-otp`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: credentials.email, otp })
@@ -67,7 +67,7 @@ function Register(props) {
         }
         e.preventDefault();
         const { name, uname, email, password } = credentials;
-        const response = await fetch(`${process.env.BACKEND_URL}/api/auth/createuser`, {
+        const response = await fetch(`/api/auth/createuser`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
