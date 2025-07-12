@@ -14,7 +14,14 @@ function ChatInterface(props) {
     const [isTyping, setIsTyping] = useState(false);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        const messagesContainer = document.querySelector('.chat-messages');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        // Also use the ref as backup
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+        // Reset user scrolled up state
+        setUserScrolledUp(false);
     };
 
     // Helper to parse time string (e.g., '12:34:56 PM') to Date object for today
@@ -60,8 +67,29 @@ function ChatInterface(props) {
                 deleteNote(note.id);
             }
         });
-        // Removed scrollToBottom() to prevent auto-scroll during refresh
     }, [notes,deleteNote]);
+
+    // Track if user has scrolled up manually
+    const [userScrolledUp, setUserScrolledUp] = useState(false);
+
+    // Handle scroll events to detect if user scrolled up
+    const handleScroll = () => {
+        const messagesContainer = document.querySelector('.chat-messages');
+        if (messagesContainer) {
+            const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 10px tolerance
+            setUserScrolledUp(!isAtBottom);
+        }
+    };
+
+    // Add scroll listener to messages container
+    useEffect(() => {
+        const messagesContainer = document.querySelector('.chat-messages');
+        if (messagesContainer) {
+            messagesContainer.addEventListener('scroll', handleScroll);
+            return () => messagesContainer.removeEventListener('scroll', handleScroll);
+        }
+    }, []);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -76,10 +104,9 @@ function ChatInterface(props) {
         setNewMessage("");
         showAlert("Message sent", "success");
         
-        // Scroll to bottom when sending a message
-        setTimeout(() => {
-            scrollToBottom();
-        }, 100);
+        // Reset user scrolled up state and scroll to bottom when sending a message
+        setUserScrolledUp(false);
+        scrollToBottom();
         
         // Focus back to the message input after sending
         setTimeout(() => {
@@ -134,6 +161,14 @@ function ChatInterface(props) {
                         </div>
                     )}
                     
+                    {/* New messages indicator */}
+                    {userScrolledUp && (
+                        <div className="new-messages-indicator" onClick={scrollToBottom}>
+                            <i className="fas fa-arrow-down"></i>
+                            <span>New messages</span>
+                        </div>
+                    )}
+                    
                     {filteredNotes.map((note, index) => {
                         const isSent = true;
                         return (
@@ -165,17 +200,16 @@ function ChatInterface(props) {
                                 placeholder="Type a message..."
                                 rows="1"
                             />
+                            <button type="submit" className="send-button">
+                                <i className="fas fa-paper-plane"></i>
+                            </button>
                             <button 
                                 type="button" 
-                                className="scroll-button"
+                                className="goto-bottom-button"
                                 onClick={scrollToBottom}
-                                title="Scroll to bottom"
+                                title="Go to bottom"
                             >
                                 <i className="fas fa-arrow-down"></i>
-                            </button>
-                            <button type="submit"  className="send-button">
-                                <i className="fas fa-paper-plane"></i>
-
                             </button>
                         </div>
                     </form>

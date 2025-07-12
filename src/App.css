@@ -5,6 +5,8 @@
 .Homepage {
   background: #f0f2f5;
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* Prevent scrolling on mobile */
 }
 i {
   cursor: pointer;
@@ -57,10 +59,61 @@ i {
 
 /* Chat Interface Styles */
 .chat-container {
-  height: 90vh;
+  height: calc(100vh - 56px); /* Subtract navbar height */
   display: flex;
   flex-direction: column;
   background: #000;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .chat-container {
+    height: calc(100vh - 56px - env(safe-area-inset-bottom));
+    min-height: 300px; /* Minimum height to prevent too small container */
+  }
+  
+  .chat-input {
+    padding: 10px;
+  }
+  
+  .input-group {
+    gap: 8px;
+  }
+  
+  .message-input {
+    padding: 10px 15px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .send-button {
+    width: 50px;
+    height: 40px;
+  }
+  
+  .goto-bottom-button {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .new-messages-indicator {
+    bottom: 80px;
+    right: 15px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+
+}
+
+/* Handle mobile keyboard */
+@media (max-width: 768px) and (max-height: 500px) {
+  .chat-container {
+    height: calc(100vh - 56px - 200px); /* Reduce height when keyboard is open */
+  }
+  
+  .chat-messages {
+    padding: 10px;
+  }
 }
 
 .chat-header {
@@ -182,6 +235,48 @@ i {
 .send-button:hover {
   background: #054d44;
 }
+
+.goto-bottom-button {
+  background: #2b7269;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.goto-bottom-button:hover {
+  background: #054d44;
+}
+
+.new-messages-indicator {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  background: #2b7269;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.new-messages-indicator:hover {
+  background: #054d44;
+  transform: translateY(-2px);
+}
+
+
 
 .chat-messages::-webkit-scrollbar {
   width: 6px;
