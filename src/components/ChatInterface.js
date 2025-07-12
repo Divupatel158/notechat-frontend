@@ -203,14 +203,6 @@ function ChatInterface(props) {
                             <button type="submit" className="send-button">
                                 <i className="fas fa-paper-plane"></i>
                             </button>
-                            <button 
-                                type="button" 
-                                className="goto-bottom-button"
-                                onClick={scrollToBottom}
-                                title="Go to bottom"
-                            >
-                                <i className="fas fa-arrow-down"></i>
-                            </button>
                         </div>
                     </form>
                 </div>

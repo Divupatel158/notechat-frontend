@@ -207,7 +207,6 @@ i {
   display: flex;
   gap: 10px;
 }
-
 .message-input {
   flex: 1;
   border: none;
@@ -218,7 +217,6 @@ i {
   color: #fff;
   border:1px solid #999;
 }
-
 .send-button {
   background: #2b7269;
   color: white;
@@ -236,23 +234,7 @@ i {
   background: #054d44;
 }
 
-.goto-bottom-button {
-  background: #2b7269;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
 
-.goto-bottom-button:hover {
-  background: #054d44;
-}
 
 .new-messages-indicator {
   position: fixed;
