@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
   ADD_NOTE: `${API_BASE_URL}/api/notes/addnote`,
   UPDATE_NOTE: `${API_BASE_URL}/api/notes/updatenote`,
   DELETE_NOTE: `${API_BASE_URL}/api/notes/deletenote`,
+  CLEAR_ALL_NOTES: `${API_BASE_URL}/api/notes/clearallnotes`,
 };
 
 export default API_ENDPOINTS; 

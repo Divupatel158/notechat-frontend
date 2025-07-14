@@ -13,7 +13,7 @@ function App() {
     setAlert({ msg: message, type: type });
     setTimeout(() => {
       setAlert(null);
-    }, 3000);
+    }, 2000);
   }
   return (
     <div className='Homepage'>

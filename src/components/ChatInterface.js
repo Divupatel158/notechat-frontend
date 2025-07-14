@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function ChatInterface(props) {
     const context = useContext(NoteContext);
-    const { notes, getNote, addNote, deleteNote } = context;
+    const { notes, getNote, addNote, deleteNote, clearAllNotes } = context;
     const { showAlert } = props;
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
@@ -126,6 +126,20 @@ function ChatInterface(props) {
         setIsTyping(e.target.value.length > 0);
     };
 
+    const handleClearChat = async () => {
+        // Show confirmation dialog
+        const isConfirmed = window.confirm("Are you sure you want to clear all messages? This action cannot be undone.");
+        
+        if (isConfirmed) {
+            const success = await clearAllNotes();
+            if (success) {
+                showAlert("All messages cleared successfully", "success");
+            } else {
+                showAlert("Failed to clear messages", "warning");
+            }
+        }
+    };
+
     // Only show messages not older than 24 hours
     const now = new Date();
     const filteredNotes = notes.filter(note => {
@@ -150,6 +164,14 @@ function ChatInterface(props) {
                         <h6 className="mb-0">{localStorage.getItem('uname')}'s Chat</h6>
                         <small>{isTyping ? 'typing...' : 'Online'}</small>
                     </div>
+                    <button 
+                        className="btn btn-outline-danger btn-sm ms-auto"
+                        onClick={handleClearChat}
+                        title="Clear all messages"
+                    >
+                        <i className="fas fa-trash-alt me-1"></i>
+                        Clear Chat
+                    </button>
                 </div>
 
                 {/* Messages Area */}
@@ -165,7 +187,7 @@ function ChatInterface(props) {
                     {userScrolledUp && (
                         <div className="new-messages-indicator" onClick={scrollToBottom}>
                             <i className="fas fa-arrow-down"></i>
-                            <span>New messages</span>
+                            <span>Go Down</span>
                         </div>
                     )}
                     

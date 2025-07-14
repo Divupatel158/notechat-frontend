@@ -118,8 +118,43 @@ const NoteState = (props) => {
       console.error("Error deleting note:", error);
     }
   }
+
+  //clear all notes
+  const clearAllNotes = async () => {
+    try {
+      console.log("Attempting to clear all notes...");
+      console.log("API endpoint:", API_ENDPOINTS.CLEAR_ALL_NOTES);
+      
+      const response = await fetch(API_ENDPOINTS.CLEAR_ALL_NOTES, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem('token')
+        }
+      });
+      
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+      
+      if (!response.ok) {
+        console.error("Failed to clear all notes:", response.status);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        return false;
+      }
+      
+      const json = await response.json();
+      console.log("Success response:", json);
+      setNotes([]); // Clear all notes from state
+      return true;
+    } catch (error) {
+      console.error("Error clearing all notes:", error);
+      return false;
+    }
+  }
+
   return (
-    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNote }}>
+    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNote, clearAllNotes }}>
       {props.children}
     </NoteContext.Provider>
   )
