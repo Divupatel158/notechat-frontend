@@ -178,6 +178,7 @@ function Register(props) {
                                                                 id="otp"
                                                                 className="form-control"
                                                                 name='otp'
+                                                                maxLength={6}
                                                                 placeholder='Enter OTP'
                                                                 value={otp}
                                                                 onChange={e => setOtp(e.target.value)}
