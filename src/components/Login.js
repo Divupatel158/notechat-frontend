@@ -1,36 +1,29 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'
-import { NavLink } from 'react-router-dom';
-// import { API_ENDPOINTS } from '../config';
+import { useNavigate, NavLink } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
+
 function Login(props) {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     let navigate = useNavigate();
     const hendalSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch('https://notechat-backend-production.up.railway.app/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: credentials.email, password: credentials.password }),
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password
         });
-        const data = await response.json();
-        if (data.success) {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("uname", data.uname);
-            localStorage.setItem("id", data.id);
-            localStorage.setItem("email", data.email); // Store the user's email for chat system
-
-            navigate("/");
-            props.showAlert("Login Successful", "success");
+        if (error) {
+            props.showAlert("Please enter valid credentials", "warning");
+            return;
         }
-        else {
-            props.showAlert("please enter valid data to login", "warning");
-        }
-    }
+        // Store the JWT
+        localStorage.setItem("token", data.session.access_token);
+        localStorage.setItem("email", credentials.email);
+        navigate("/");
+        props.showAlert("Login Successful", "success");
+    };
     const onChange = (e) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value })
-    }
+    };
     return (
         <>
             <section className="vh-99 pb-4 pt-3">
