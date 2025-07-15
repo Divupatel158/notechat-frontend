@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { NavLink } from 'react-router-dom';
-import { API_ENDPOINTS } from '../config';
+// import { API_ENDPOINTS } from '../config';
 function Login(props) {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     let navigate = useNavigate();
     const hendalSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch(API_ENDPOINTS.LOGIN, {
-            method: "POST",
+        const response = await fetch('https://notechat-backend-production.up.railway.app/api/auth/login', {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json"
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                email: credentials.email,
-                password: credentials.password
-            })
+            body: JSON.stringify({ email: credentials.email, password: credentials.password }),
         });
         const data = await response.json();
         if (data.success) {
             localStorage.setItem("token", data.token);
             localStorage.setItem("uname", data.uname);
             localStorage.setItem("id", data.id);
+            localStorage.setItem("email", data.email); // Store the user's email for chat system
 
             navigate("/");
             props.showAlert("Login Successful", "success");

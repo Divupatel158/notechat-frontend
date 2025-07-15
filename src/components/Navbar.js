@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, Link } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { API_ENDPOINTS } from '../config';
 function NavBar(props) {
@@ -63,6 +63,12 @@ function NavBar(props) {
                   </li>
                   <li className="nav-item">
                     <NavLink className={`btn btn-primary mx-2 my-2`} onClick={handleLogout} >Logout</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link btn btn-secondary mx-2 my-2" to="/">Notes</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/chats">Chats</Link>
                   </li>
                 </ul>
                 )

@@ -7,6 +7,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import { useState } from 'react';
 import Alert from './components/Alert'
+import ChatsList from './components/ChatsList';
+import ChatPage from './components/ChatPage';
 function App() {
   const [alert, setAlert] = useState();
   const showAlert = (message, type) => {
@@ -22,7 +24,15 @@ function App() {
         <Alert alert={alert} />
         <div className="container-fluid p-0">
           <Routes>
-            {localStorage.getItem('token') ? <Route path="/" element={<Home showAlert={showAlert} />} /> : <Route path="/" element={<Login showAlert={showAlert} />} />}
+            {localStorage.getItem('token') ? (
+              <>
+                <Route path="/" element={<Home showAlert={showAlert} />} />
+                <Route path="/chats" element={<ChatsList />} />
+                <Route path="/chat/:email" element={<ChatPage />} />
+              </>
+            ) : (
+              <Route path="/" element={<Login showAlert={showAlert} />} />
+            )}
             <Route path="/login" element={<Login showAlert={showAlert} />} />
             <Route path="/register" element={<Register showAlert={showAlert} />} />
           </Routes>
