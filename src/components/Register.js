@@ -99,7 +99,6 @@ function Register(props) {
     const onChange = (e) => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value })
     }
-
     // Responsive styles for the registration card and image
     const cardStyle = {
         borderRadius: "25px",
@@ -109,7 +108,6 @@ function Register(props) {
         maxWidth: 900,
         lineHeight: 1.1 // Decreased line height
     };
-
     const imgStyle = {
         width: "100%",
         maxWidth: 350,
@@ -117,12 +115,10 @@ function Register(props) {
         display: "block",
         objectFit: "contain"
     };
-
     // Decreased line height for form controls and text
     const inputStyle = {
         lineHeight: 1.1
     };
-
     return (
         <>
             <section className="vh-99 pb-4" style={{ backgroundColor: "transparent" }}>
