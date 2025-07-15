@@ -178,7 +178,7 @@ function Register(props) {
                                                         <i className="fas fa-key fa-lg me-3 fa-fw"></i>
                                                         <div data-mdb-input-init className="form-outline flex-fill mb-0 d-flex align-items-center flex-wrap">
                                                             <input
-                                                                type="text"
+                                                                type="password"
                                                                 id="otp"
                                                                 className="form-control"
                                                                 name='otp'
