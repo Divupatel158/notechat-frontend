@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import Navbar from './Navbar';
 
 const API_BASE = 'https://notechat-backend-production.up.railway.app';
 
@@ -68,17 +69,49 @@ const ChatPage = () => {
 
   return (
     <div
+      className="chat-page-container"
       style={{
-        maxWidth: 600,
-        margin: '0 auto',
-        padding: 8,
+        width: '100vw',
+        margin: 0,
+        padding: 0,
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh', // Full viewport height
-        boxSizing: 'border-box'
+        height: '100vh',
+        boxSizing: 'border-box',
+        position: 'relative',
+        background: '#fff',
+        overflowX: 'hidden'
       }}
     >
-      <h2>{contactUname ? contactUname : email}</h2>
+      {/* Fixed Navbar */}
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000 }}>
+        <Navbar />
+      </div>
+      {/* Fixed Chat Header (copied from ChatInterface) */}
+      <div style={{
+        position: 'fixed',
+        top: 75, // below navbar
+        left: 0,
+        width: '100vw',
+        height: 56,
+        background: '#f8f9fa',
+        borderBottom: '1px solid #ccc',
+        zIndex: 999,
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 16px',
+        fontWeight: 'bold',
+        fontSize: 18
+      }}>
+        <div className="avatar" style={{ marginRight: 12 }}>
+          <img src="/media/dp.jpg" alt="Profile" style={{ width: 40, height: 40, borderRadius: '50%' }} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 600 }}>{contactUname ? contactUname : email}</div>
+          <small style={{ color: '#888' }}>Online</small>
+        </div>
+      </div>
+      {/* Messages Area */}
       <div
         className="chat-messages"
         style={{
@@ -88,7 +121,11 @@ const ChatPage = () => {
           padding: 10,
           marginBottom: 10,
           background: '#fafafa',
-          minHeight: 0 // Important for flexbox scroll
+          minHeight: 0,
+          marginTop: 131, // 75 (navbar) + 56 (header)
+          width: '100vw',
+          boxSizing: 'border-box',
+          overflowX: 'hidden'
         }}
       >
         {messages.map(msg => (
@@ -117,7 +154,7 @@ const ChatPage = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={sendMessage} style={{ display: 'flex', gap: 8 }}>
+      <form onSubmit={sendMessage} style={{ display: 'flex', gap: 8, padding: 8, width: '100vw', boxSizing: 'border-box' }}>
         <input
           type="text"
           value={newMsg}
@@ -132,6 +169,18 @@ const ChatPage = () => {
         />
         <button type="submit" style={{ padding: '8px 16px' }}>Send</button>
       </form>
+      <style>{`
+        html, body, #root {
+          width: 100vw !important;
+          overflow-x: hidden !important;
+        }
+        .chat-page-container, .chat-messages {
+          width: 100vw !important;
+          max-width: 100vw !important;
+          margin: 0 !important;
+          overflow-x: hidden !important;
+        }
+      `}</style>
     </div>
   );
 };
