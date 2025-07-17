@@ -6,12 +6,17 @@ const NoteState = (props) => {
   const [notes, setNotes] = useState(notesInitial);
   //get All note
   const getNote = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error("No token found in localStorage! User is not logged in.");
+      return;
+    }
     try {
       const response = await fetch(API_ENDPOINTS.FETCH_ALL_NOTES, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": localStorage.getItem('token')
+          "Authorization": `Bearer ${token}`
         },
       });
       
@@ -35,7 +40,7 @@ const NoteState = (props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": localStorage.getItem('token')
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ title, description, tag })
       });
@@ -60,7 +65,7 @@ const NoteState = (props) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": localStorage.getItem('token')
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ title, description, tag })
       });
@@ -97,7 +102,7 @@ const NoteState = (props) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": localStorage.getItem('token')
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
         }
       });
       
@@ -129,7 +134,7 @@ const NoteState = (props) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": localStorage.getItem('token')
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
         }
       });
       

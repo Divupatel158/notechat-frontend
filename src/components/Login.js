@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+// import { supabase } from '../supabaseClient';
 
 function Login(props) {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     let navigate = useNavigate();
     const hendalSubmit = async (e) => {
         e.preventDefault();
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: credentials.email,
-            password: credentials.password
+        const response = await fetch('https://notechat-backend-production.up.railway.app/api/auth/login', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password
+            })
         });
-        if (error) {
-            props.showAlert("Please enter valid credentials", "warning");
+        const data = await response.json();
+        if (!data.success) {
+            props.showAlert(data.errors || "Please enter valid credentials", "warning");
             return;
         }
         // Store the JWT
-        localStorage.setItem("token", data.session.access_token);
+        localStorage.setItem("token", data.token);
         localStorage.setItem("email", credentials.email);
+        localStorage.setItem("uname", data.uname);
         navigate("/");
         props.showAlert("Login Successful", "success");
     };

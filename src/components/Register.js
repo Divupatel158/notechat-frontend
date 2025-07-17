@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+// import { supabase } from '../supabaseClient';
 
 function Register(props) {
     const { showAlert } = props;
@@ -77,22 +77,23 @@ function Register(props) {
             showAlert("Please verify OTP before registering", "warning");
             return false;
         }
-        // Supabase sign up
-        const { data, error } = await supabase.auth.signUp({
-            email: credentials.email,
-            password: credentials.password,
-            options: {
-                data: {
-                    name: credentials.name,
-                    uname: credentials.uname
-                }
-            }
+        // Call backend API to create user in users table
+        const response = await fetch('https://notechat-backend-production.up.railway.app/api/auth/createuser', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: credentials.name,
+                uname: credentials.uname,
+                email: credentials.email,
+                password: credentials.password
+            })
         });
-        if (error) {
-            showAlert(error.message, "warning");
+        const data = await response.json();
+        if (!data.success) {
+            showAlert(data.errors || "Registration failed", "warning");
             return;
         }
-        showAlert("Account created successfully. Please check your email to confirm.", "success");
+        showAlert("Account created successfully. Please login.", "success");
         navigate("/login");
     };
 

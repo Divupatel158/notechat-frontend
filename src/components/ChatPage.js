@@ -7,6 +7,7 @@ const ChatPage = () => {
   const { email } = useParams();
   const [messages, setMessages] = useState([]);
   const [contact, setContact] = useState(null);
+  const [contactUname, setContactUname] = useState("");
   const [newMsg, setNewMsg] = useState('');
 //   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
@@ -17,12 +18,21 @@ const ChatPage = () => {
   const fetchMessages = async () => {
     // setLoading(true);
     const res = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(email)}`, {
-      headers: { 'auth-token': token }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
     setMessages(data.messages || []);
     if (data.messages && data.messages.length > 0) {
       setContact(data.messages[0].sender.email === myEmail ? data.messages[0].receiver : data.messages[0].sender);
+      setContactUname(data.messages[0].sender.email === myEmail ? data.messages[0].receiver.uname : data.messages[0].sender.uname);
+    } else {
+      // If no messages, fetch uname by email
+      fetch(`${API_BASE}/api/auth/getallusers`)
+        .then(res => res.json())
+        .then(data => {
+          const user = data.users.find(u => u.email === email);
+          setContactUname(user ? user.uname : email);
+        });
     }
     // setLoading(false);
   };
@@ -43,7 +53,7 @@ const ChatPage = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': token
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ receiver_email: email, content: newMsg })
     });
@@ -56,7 +66,7 @@ const ChatPage = () => {
 
   return (
     <div>
-      <h2>{contact ? `${contact.uname} (${contact.email})` : email}</h2>
+      <h2>{contactUname ? contactUname : email}</h2>
       <div style={{ border: '1px solid #ccc', height: 400, overflowY: 'auto', padding: 10, marginBottom: 10 }}>
         {messages.map(msg => (
           <div
