@@ -47,10 +47,24 @@ function Register(props) {
             return;
         }
         setVerifyingOtp(true);
-        // ...existing OTP verify logic...
-        setVerifyingOtp(false);
-        setOtpVerified(true);
-        showAlert("OTP verified! You can now register.", "success");
+        try {
+            const response = await fetch('https://notechat-backend-production.up.railway.app/api/auth/verify-email-otp', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: credentials.email, otp })
+            });
+            const data = await response.json();
+            setVerifyingOtp(false);
+            if (data.success) {
+                setOtpVerified(true);
+                showAlert("OTP verified! You can now register.", "success");
+            } else {
+                showAlert(data.error || "Invalid OTP", "warning");
+            }
+        } catch (err) {
+            setVerifyingOtp(false);
+            showAlert("Network error. Please try again.", "warning");
+        }
     };
 
     const hendalSubmit = async (e) => {
@@ -117,10 +131,32 @@ function Register(props) {
                                     </div>
                                 )}
                                 {otpSent && (
-                                    <div className="form-outline mb-3">
-                                        <div className="d-flex flex-row gap-2 align-items-center">
-                                            <input type="text" id="otp" className="form-control form-control-lg" name='otp' value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} inputMode="numeric" pattern="\d*" required={!otpVerified} disabled={otpVerified} style={{ lineHeight: 1, fontSize: '1rem', maxWidth: 100 }} placeholder="OTP" />
-                                            <button className="btn btn-info flex-shrink-0" onClick={handleVerifyOtp} disabled={verifyingOtp || otpVerified} type="button" style={{ whiteSpace: 'nowrap' }}>Verify OTP</button>
+                                     <div className="form-outline mb-3">
+                                        <div className="d-flex gap-2 align-items-center" style={{ width: "100%" }}>
+                                            <input
+                                                type="password"
+                                                id="otp"
+                                                className="form-control form-control-lg flex-grow-1"
+                                                name="otp"
+                                                value={otp}
+                                                onChange={e => setOtp(e.target.value)}
+                                                maxLength={6}
+                                                inputMode="numeric"
+                                                pattern="\d*"
+                                                required={!otpVerified}
+                                                disabled={otpVerified}
+                                                style={{ lineHeight: 1, fontSize: '1rem' }}
+                                                placeholder="OTP"
+                                            />
+                                            <button
+                                                className={`btn ${otpVerified ? "btn-success" : "btn-danger"} w-25`}
+                                                onClick={handleVerifyOtp}
+                                                disabled={verifyingOtp || otpVerified}
+                                                type="button"
+                                                style={{ whiteSpace: 'nowrap' }}
+                                            >
+                                                {otpVerified ? "Verified" : "Verify OTP"}
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -130,7 +166,7 @@ function Register(props) {
                                 <div className="form-outline mb-3">
                                     <input type="password" id="cpassword" className="form-control form-control-lg" name='cpassword' value={credentials.cpassword} onChange={onChange} required style={{ lineHeight: 1, fontSize: '1rem' }} placeholder="Confirm Password" />
                                 </div>
-                                <button type="submit" className="btn btn-primary btn-lg btn-block w-100">Sign up</button>
+                                <button type="submit" className="btn btn-primary btn-lg btn-block w-100">Registration </button>
                                 <div className="divider d-flex align-items-center my-4">
                                     <p className="text-center fw-bold mx-3 mb-0 text-muted">Already a member? <NavLink to="/login">Login</NavLink></p>
                                 </div>
