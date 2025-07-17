@@ -38,8 +38,13 @@ const ChatPage = () => {
   };
 
   useEffect(() => {
-    fetchMessages();
-    // No polling
+    fetchMessages(); // Initial fetch
+  
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 3000); // fetch every 3 seconds
+  
+    return () => clearInterval(interval); // cleanup on unmount
   }, [email, token, myEmail]);
 
   useEffect(() => {
