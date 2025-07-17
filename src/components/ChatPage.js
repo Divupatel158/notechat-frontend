@@ -9,14 +9,12 @@ const ChatPage = () => {
   const [contact, setContact] = useState(null);
   const [contactUname, setContactUname] = useState("");
   const [newMsg, setNewMsg] = useState('');
-//   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   const token = localStorage.getItem('token');
   const myEmail = localStorage.getItem('email');
 
   // Fetch messages function
   const fetchMessages = async () => {
-    // setLoading(true);
     const res = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(email)}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -34,22 +32,23 @@ const ChatPage = () => {
           setContactUname(user ? user.uname : email);
         });
     }
-    // setLoading(false);
   };
 
   useEffect(() => {
-    fetchMessages(); // Initial fetch
-  
+    fetchMessages();
+    // Set up polling every 1 second
     const interval = setInterval(() => {
       fetchMessages();
-    }, 3000); // fetch every 3 seconds
-  
-    return () => clearInterval(interval); // cleanup on unmount
+    }, 1000);
+    return () => clearInterval(interval);
   }, [email, token, myEmail]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    // Only scroll to bottom if a new message is added
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages.length]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -67,12 +66,31 @@ const ChatPage = () => {
     fetchMessages();
   };
 
-//   if (loading) return <div>Loading chat...</div>;
-
   return (
-    <div>
+    <div
+      style={{
+        maxWidth: 600,
+        margin: '0 auto',
+        padding: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh', // Full viewport height
+        boxSizing: 'border-box'
+      }}
+    >
       <h2>{contactUname ? contactUname : email}</h2>
-      <div style={{ border: '1px solid #ccc', height: 400, overflowY: 'auto', padding: 10, marginBottom: 10 }}>
+      <div
+        className="chat-messages"
+        style={{
+          border: '1px solid #ccc',
+          flex: 1,
+          overflowY: 'auto',
+          padding: 10,
+          marginBottom: 10,
+          background: '#fafafa',
+          minHeight: 0 // Important for flexbox scroll
+        }}
+      >
         {messages.map(msg => (
           <div
             key={msg.id}
@@ -106,6 +124,11 @@ const ChatPage = () => {
           onChange={e => setNewMsg(e.target.value)}
           placeholder="Type your message..."
           style={{ flex: 1, padding: 8 }}
+          onFocus={() => {
+            setTimeout(() => {
+              document.activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+          }}
         />
         <button type="submit" style={{ padding: '8px 16px' }}>Send</button>
       </form>
