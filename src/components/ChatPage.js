@@ -67,6 +67,47 @@ const ChatPage = () => {
     fetchMessages();
   };
 
+  const chatStyles = `
+  .chat-bubble {
+    position: relative;
+    word-wrap: break-word;
+  }
+  .chat-bubble:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+  }
+  .chat-bubble.bg-white:before {
+    left: -8px;
+    top: 10px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid white;
+  }
+  .chat-bubble.bg-primary:before {
+    right: -8px;
+    top: 10px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid #0d6efd;
+  }
+  .chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+  .chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+`;
+
   return (
     <div
       className="chat-page-container"
@@ -83,6 +124,7 @@ const ChatPage = () => {
         overflowX: 'hidden'
       }}
     >
+      <style>{chatStyles}</style>
       {/* Fixed Navbar */}
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000 }}>
         <Navbar />
@@ -123,6 +165,7 @@ const ChatPage = () => {
           background: '#fafafa',
           minHeight: 0,
           marginTop: 131, // 75 (navbar) + 56 (header)
+          paddingTop: 8, // extra space for scroll-to-top
           width: '100vw',
           boxSizing: 'border-box',
           overflowX: 'hidden'
@@ -131,25 +174,27 @@ const ChatPage = () => {
         {messages.map(msg => (
           <div
             key={msg.id}
-            style={{
-              textAlign: msg.sender.email === myEmail ? 'right' : 'left',
-              margin: '8px 0'
-            }}
+            className={
+              msg.sender.email === myEmail
+                ? 'd-flex justify-content-end mb-3'
+                : 'd-flex justify-content-start mb-3'
+            }
           >
-            <span
-              style={{
-                display: 'inline-block',
-                background: msg.sender.email === myEmail ? '#dcf8c6' : '#fff',
-                padding: '6px 12px',
-                borderRadius: 12,
-                maxWidth: '70%',
-                wordBreak: 'break-word'
-              }}
+            <div
+              className={
+                'chat-bubble ' +
+                (msg.sender.email === myEmail
+                  ? 'bg-primary text-white'
+                  : 'bg-white') +
+                ' p-3 rounded shadow-sm'
+              }
+              style={{ maxWidth: '70%', border: msg.sender.email === myEmail ? 'none' : '1px solid #e9ecef', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
             >
-              {msg.content}
-              <br />
-              <small>{msg.created_at ? new Date(msg.created_at).toLocaleString() : ''}</small>
-            </span>
+              <span style={{ flex: 1, wordBreak: 'break-word' }}>{msg.content}</span>
+              <span style={{ fontSize: 12, marginLeft: 8, opacity: 0.7, whiteSpace: 'nowrap' }}>
+                {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+              </span>
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
