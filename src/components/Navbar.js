@@ -59,16 +59,16 @@ function NavBar(props) {
             {localStorage.getItem('token') ?(
                 <ul className="navbar-nav ms-auto d-flex align-items-center">
                   <li className="nav-item">
-                    <NavLink className={`btn btn-primary mx-2 my-2`} onClick={handleDelete} >Delete Account</NavLink>
+                    <NavLink className={`btn btn-secondary mx-2 my-2 p-2`} onClick={handleDelete} >Delete Account</NavLink>
                   </li>
                   <li className="nav-item">
-                    <NavLink className={`btn btn-primary mx-2 my-2`} onClick={handleLogout} >Logout</NavLink>
+                    <NavLink className={`btn btn-secondary mx-2 my-2 p-2`} onClick={handleLogout} >Logout</NavLink>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link btn btn-secondary mx-2 my-2" to="/">Notes</Link>
+                    <Link className="nav-link bg-secondary mx-2 my-2 rounded text-white " to="/">Notes</Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link" to="/chats">Chats</Link>
+                    <Link className="nav-link bg-secondary mx-2 my-2 rounded text-white" to="/chats">Chats</Link>
                   </li>
                 </ul>
                 )

@@ -13,6 +13,7 @@ const ChatPage = () => {
   const messagesEndRef = useRef(null);
   const token = localStorage.getItem('token');
   const myEmail = localStorage.getItem('email');
+  const [deleting, setDeleting] = useState(false);
 
   // Fetch messages function
   const fetchMessages = async () => {
@@ -65,6 +66,22 @@ const ChatPage = () => {
     setNewMsg('');
     // Fetch messages again after sending
     fetchMessages();
+  };
+
+  // Delete all chat messages handler
+  const handleDeleteChat = async () => {
+    if (!window.confirm('Are you sure you want to delete all messages in this chat? This cannot be undone.')) return;
+    setDeleting(true);
+    try {
+      await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(email)}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      await fetchMessages();
+    } catch (err) {
+      alert('Failed to delete chat messages.');
+    }
+    setDeleting(false);
   };
 
   const chatStyles = `
@@ -132,18 +149,19 @@ const ChatPage = () => {
       {/* Fixed Chat Header (copied from ChatInterface) */}
       <div style={{
         position: 'fixed',
-        top: 75, // below navbar
+        top: 72, // below navbar
         left: 0,
         width: '100vw',
-        height: 56,
-        background: '#f8f9fa',
+        height: 80,
+        background: '#3E5F44',
         borderBottom: '1px solid #ccc',
         zIndex: 999,
         display: 'flex',
         alignItems: 'center',
         padding: '0 16px',
         fontWeight: 'bold',
-        fontSize: 18
+        fontSize: 18,
+        color: '#fff'
       }}>
         <div className="avatar" style={{ marginRight: 12 }}>
           <img src="/media/dp.jpg" alt="Profile" style={{ width: 40, height: 40, borderRadius: '50%' }} />
@@ -152,7 +170,31 @@ const ChatPage = () => {
           <div style={{ fontWeight: 600 }}>{contactUname ? contactUname : email}</div>
           <small style={{ color: '#888' }}>Online</small>
         </div>
+        <button
+          onClick={handleDeleteChat}
+          disabled={deleting}
+          title="Delete all chat messages"
+          style={{
+            background: 'none',
+            color: 'red',
+            border:"2px solid red",
+            fontSize: 15,
+            cursor: deleting ? 'not-allowed' : 'pointer',
+            marginLeft: 8,
+            padding: 8,
+            borderRadius: 4,
+            transition: 'background 0.2s',
+            outline: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            opacity: deleting ? 0.5 : 1
+          }}
+        >
+          <i className="fas fa-trash-alt me-1"></i>
+         Delete Chat
+        </button>
       </div>
+      <div style={{height: 150, backgroundColor:'#3E5F44'}}></div>
       {/* Messages Area */}
       <div
         className="chat-messages"
@@ -162,7 +204,7 @@ const ChatPage = () => {
           overflowY: 'auto',
           padding: 10,
           marginBottom: 10,
-          background: '#fafafa',
+          background: '#93DA97',
           minHeight: 0,
           marginTop: 131, // 75 (navbar) + 56 (header)
           paddingTop: 8, // extra space for scroll-to-top
@@ -199,20 +241,20 @@ const ChatPage = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={sendMessage} style={{ display: 'flex', gap: 8, padding: 8, width: '100vw', boxSizing: 'border-box' }}>
+      <form onSubmit={sendMessage} style={{ display: 'flex', gap: 8, padding: 8, width: '100vw', boxSizing: 'border-box'}}>
         <input
           type="text"
           value={newMsg}
           onChange={e => setNewMsg(e.target.value)}
           placeholder="Type your message..."
-          style={{ flex: 1, padding: 8 }}
+          style={{ flex: 1, padding: 8, paddingLeft:'15px', border:'1px solid gray', borderTopLeftRadius:'50px', borderBottomLeftRadius:'50px' }}
           onFocus={() => {
             setTimeout(() => {
               document.activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 300);
           }}
         />
-        <button type="submit" style={{ padding: '8px 16px' }}>Send</button>
+        <button type="submit" style={{ padding: '8px 3vw', border:'1px solid gray',borderTopRightRadius:'50px',borderBottomRightRadius:'50px' }}>Send</button>
       </form>
       <style>{`
         html, body, #root {
