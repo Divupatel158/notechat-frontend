@@ -36,18 +36,18 @@ const ChatPage = () => {
   // Fetch messages function
   const fetchMessages = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(email)}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
+    const res = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(email)}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
       // console.log('Fetched messages:', data.messages);
-      setMessages(data.messages || []);
+    setMessages(data.messages || []);
       
-      if (data.messages && data.messages.length > 0) {
-        setContact(data.messages[0].sender.email === myEmail ? data.messages[0].receiver : data.messages[0].sender);
-        setContactUname(data.messages[0].sender.email === myEmail ? data.messages[0].receiver.uname : data.messages[0].sender.uname);
-      } else {
-        // If no messages, fetch uname by email
+    if (data.messages && data.messages.length > 0) {
+      setContact(data.messages[0].sender.email === myEmail ? data.messages[0].receiver : data.messages[0].sender);
+      setContactUname(data.messages[0].sender.email === myEmail ? data.messages[0].receiver.uname : data.messages[0].sender.uname);
+    } else {
+      // If no messages, fetch uname by email
         try {
           const userRes = await fetch(`${API_BASE}/api/auth/getallusers`);
           const userData = await userRes.json();
@@ -56,7 +56,7 @@ const ChatPage = () => {
         } catch (error) {
           // console.error('Error fetching users:', error);
           setContactUname(email);
-        }
+    }
       }
     } catch (error) {
       // console.error('Error fetching messages:', error);
@@ -193,7 +193,7 @@ const ChatPage = () => {
       const timeSinceLastUpdate = Date.now() - lastUpdateRef.current;
       if (timeSinceLastUpdate > 10000) { // 10 seconds
         // console.log('Auto-refreshing messages...');
-        fetchMessages();
+      fetchMessages();
       }
     }, 15000); // Check every 15 seconds
 
@@ -255,9 +255,9 @@ const ChatPage = () => {
     } else {
       // On subsequent updates, only scroll if user is at (or near) the bottom
       if (isAtBottom(chatContainerRef)) {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
       }
     }
   }, [messages]);
@@ -275,11 +275,11 @@ const ChatPage = () => {
     try {
       // Send to backend
       const response = await fetch(`${API_BASE}/api/chat/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
         body: JSON.stringify({ receiver_email: email, content })
       });
       if (!response.ok) {
@@ -451,7 +451,7 @@ const ChatPage = () => {
           }}
         >
           <i className="fas fa-trash-alt me-1"></i>
-          Delete Chat
+         Delete Chat
         </button>
       </div>
       
@@ -481,22 +481,22 @@ const ChatPage = () => {
           </div>
         ) : (
           messages.map((msg, index) => (
-            <div
+          <div
               key={`${msg.id}-${index}`}
-              className={
+            className={
                 msg.sender?.email === myEmail
-                  ? 'd-flex justify-content-end mb-3'
-                  : 'd-flex justify-content-start mb-3'
-              }
-            >
-              <div
-                className={
-                  'chat-bubble ' +
+                ? 'd-flex justify-content-end mb-3'
+                : 'd-flex justify-content-start mb-3'
+            }
+          >
+            <div
+              className={
+                'chat-bubble ' +
                   (msg.sender?.email === myEmail
-                    ? 'bg-primary text-white'
-                    : 'bg-white') +
-                  ' p-3 rounded shadow-sm'
-                }
+                  ? 'bg-primary text-white'
+                  : 'bg-white') +
+                ' p-3 rounded shadow-sm'
+              }
                 style={{ 
                   maxWidth: '70%', 
                   border: msg.sender?.email === myEmail ? 'none' : '1px solid #e9ecef', 
@@ -505,7 +505,7 @@ const ChatPage = () => {
                   justifyContent: 'space-between',
                   opacity: msg.isTemp ? 0.7 : 1
                 }}
-              >
+            >
                 <span style={{ flex: 1, wordBreak: 'break-word' }}>
                   {msg.content}
                 </span>
@@ -643,4 +643,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+export default ChatPage; 
