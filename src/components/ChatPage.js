@@ -374,7 +374,7 @@ const ChatPage = () => {
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
+        height: '100dvh', // Use dynamic viewport height for mobile
         boxSizing: 'border-box',
         position: 'relative',
         background: '#fff',
@@ -396,13 +396,14 @@ const ChatPage = () => {
         height: 80,
         background: '#3E5F44',
         borderBottom: '1px solid #ccc',
-        zIndex: 999,
+        zIndex: 1001,
         display: 'flex',
         alignItems: 'center',
         padding: '0 16px',
         fontWeight: 'bold',
         fontSize: 18,
-        color: '#fff'
+        color: '#fff',
+        boxSizing: 'border-box'
       }}>
         <button
           onClick={() => navigate('/chats')}
@@ -463,7 +464,6 @@ const ChatPage = () => {
         ref={chatContainerRef}
         style={{
           border: '1px solid #ccc',
-          flex: 1,
           overflowY: 'auto',
           padding: 10,
           marginBottom: 10,
@@ -473,7 +473,9 @@ const ChatPage = () => {
           paddingTop: 8,
           width: '100vw',
           boxSizing: 'border-box',
-          overflowX: 'hidden'
+          overflowX: 'hidden',
+          height: 'calc(100dvh - 150px - 56px - 56px)', // 150px for header, 56px for navbar, 56px for input (approx)
+          maxHeight: 'calc(100dvh - 150px - 56px - 56px)'
         }}
       >
         {messages.length === 0 ? (
@@ -554,7 +556,7 @@ const ChatPage = () => {
       </div>
       
       {/* Message Input */}
-      <form onSubmit={sendMessage} style={{ display: 'flex', gap: 8, padding: 8, width: '100vw', boxSizing: 'border-box' }}>
+      <form onSubmit={sendMessage} style={{ display: 'flex', padding: 8, width: '100vw', boxSizing: 'border-box', position: 'fixed', bottom: 0, left: 0, background: '#fff', zIndex: 1002 }}>
         <input
           type="text"
           value={newMsg}
