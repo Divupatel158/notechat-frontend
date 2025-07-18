@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
@@ -20,41 +21,111 @@ export default function ChatsList(props) {
   const [lastMessages, setLastMessages] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [unreadChats, setUnreadChats] = useState([]); // Track unread chats
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const myEmail = localStorage.getItem('email');
   const API_BASE = 'https://notechat-backend-production.up.railway.app';
+  const socketRef = useRef(null);
 
+  // Set body background to black for full-page effect
   useEffect(() => {
-    const fetchContacts = async () => {
-      setLoading(true);
-      const res = await fetch(`${API_BASE}/api/chat/chats`, {
+    const originalBg = document.body.style.background;
+    const originalColor = document.body.style.color;
+    document.body.style.background = '#111';
+    document.body.style.color = '#bbb';
+    return () => {
+      document.body.style.background = originalBg;
+      document.body.style.color = originalColor;
+    };
+  }, []);
+
+  // Helper to sort contacts by last message time
+  const sortContacts = (contactsArr, lastMsgs) => {
+    return [...contactsArr].sort((a, b) => {
+      const aTime = lastMsgs[a.email]?.created_at || 0;
+      const bTime = lastMsgs[b.email]?.created_at || 0;
+      return new Date(bTime) - new Date(aTime);
+    });
+  };
+
+  // Fetch contacts and last messages (combined for polling)
+  const fetchContactsAndMessages = async () => {
+    setLoading(true);
+    const res = await fetch(`${API_BASE}/api/chat/chats`, {
+      headers: { 'auth-token': token }
+    });
+    const data = await res.json();
+    let contactsData = data.contacts || [];
+    // Fetch last messages
+    let lm = {};
+    let newUnread = [];
+    for (const contact of contactsData) {
+      const resMsg = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(contact.email)}`, {
         headers: { 'auth-token': token }
       });
-      const data = await res.json();
-      setContacts(data.contacts || []);
-      setLoading(false);
-    };
-    fetchContacts();
-  }, [token]);
-
-  useEffect(() => {
-    // Fetch last message for each contact
-    const fetchLastMessages = async () => {
-      let lm = {};
-      for (const contact of contacts) {
-        const res = await fetch(`${API_BASE}/api/chat/messages/${encodeURIComponent(contact.email)}`, {
-          headers: { 'auth-token': token }
-        });
-        const data = await res.json();
-        if (data.messages && data.messages.length > 0) {
-          lm[contact.email] = data.messages[data.messages.length - 1];
+      const dataMsg = await resMsg.json();
+      if (dataMsg.messages && dataMsg.messages.length > 0) {
+        const lastMsg = dataMsg.messages[dataMsg.messages.length - 1];
+        lm[contact.email] = lastMsg;
+        // If the last message is not from me, mark as unread
+        if (lastMsg.sender !== myEmail) {
+          newUnread.push(contact.email);
         }
       }
-      setLastMessages(lm);
+    }
+    // Sort contacts by last message time
+    contactsData = sortContacts(contactsData, lm);
+    setContacts(contactsData);
+    setLastMessages(lm);
+    setUnreadChats(newUnread);
+    setLoading(false);
+    // Cache in sessionStorage
+    sessionStorage.setItem('chat_contacts', JSON.stringify(contactsData));
+    sessionStorage.setItem('chat_lastMessages', JSON.stringify(lm));
+  };
+
+  // On mount, load from sessionStorage if available
+  useEffect(() => {
+    const cachedContacts = sessionStorage.getItem('chat_contacts');
+    const cachedLastMessages = sessionStorage.getItem('chat_lastMessages');
+    if (cachedContacts && cachedLastMessages) {
+      setContacts(JSON.parse(cachedContacts));
+      setLastMessages(JSON.parse(cachedLastMessages));
+      setLoading(false);
+    } else {
+      fetchContactsAndMessages();
+    }
+  }, [token, myEmail]);
+
+  // WebSocket setup for real-time chat list updates
+  useEffect(() => {
+    // Connect to socket.io server
+    const socket = io(API_BASE, { transports: ['websocket'] });
+    socketRef.current = socket;
+    // Join room for this user
+    if (myEmail) socket.emit('join', myEmail);
+    // Listen for new message events
+    socket.on('message:new', (msg) => {
+      // Refresh chat list on any new message
+      fetchContactsAndMessages();
+    });
+    return () => {
+      socket.disconnect();
     };
-    if (contacts.length > 0) fetchLastMessages();
-  }, [contacts, token]);
+    // eslint-disable-next-line
+  }, [token, myEmail]);
+
+  // Mark chat as read when opened
+  const handleChatClick = (email) => {
+    // Mark the last message as read in localStorage
+    const lastMsg = lastMessages[email];
+    if (lastMsg && lastMsg.id) {
+      localStorage.setItem(`chat_read_${email}`, lastMsg.id);
+    }
+    setUnreadChats((prev) => prev.filter(e => e !== email));
+    navigate(`/chat/${encodeURIComponent(email)}`);
+  };
 
   // Fetch all users for new chat modal
   const fetchAllUsers = async () => {
@@ -70,41 +141,45 @@ export default function ChatsList(props) {
     setShowModal(true);
   };
 
-  if (loading) return <div>Loading contacts...</div>;
-
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 0, position: 'relative' }}>
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 0, position: 'relative', background: '#111', minHeight: '100vh', color: '#bbb' }}>
       {/* Fixed Navbar */}
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000 }}>
         <Navbar />
       </div>
       {/* Main content below navbar */}
-      <div style={{ marginTop: 56 }}>
-        <h2 style={{ textAlign: 'center', padding: '20px 0', color: '#333', fontWeight: 700, letterSpacing: 1 }}>Your Chats</h2>
+      <div style={{ marginTop: 56, background: '#111', minHeight: '100vh', color: '#fff' }}>
+        <h2 style={{ textAlign: 'center', padding: '20px 0', color: '#bbb', fontWeight: 700, letterSpacing: 1 }}>Your Chats</h2>
         <div style={{ padding: 0 }}>
-          {contacts.length === 0 && <div style={{ textAlign: 'center', color: '#888', padding: 40 }}>No chats yet. Start a conversation!</div>}
-          {contacts.map(contact => {
+          {contacts.length === 0 && <div style={{ textAlign: 'center', color: '#bbb', padding: 40 }}>No chats yet. Start a conversation!</div>}
+          {contacts.map((contact, idx) => {
             const lastMsg = lastMessages[contact.email];
+            // Robust unread logic: compare last message ID to last read
+            let isUnread = false;
+            if (lastMsg && lastMsg.sender !== myEmail) {
+              const lastReadId = localStorage.getItem(`chat_read_${contact.email}`);
+              isUnread = lastMsg.id && lastMsg.id.toString() !== lastReadId;
+            }
             return (
               <div
                 key={contact.email}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  background: '#fff',
+                  background: '#222',
                   borderRadius: 12,
                   margin: '12px 16px',
                   padding: '14px 18px',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                   cursor: 'pointer',
                   transition: 'background 0.2s',
-                  border: '1px solid #ececec',
+                  border: '1px solid #222',
                   position: 'relative',
                   minHeight: 64
                 }}
-                onClick={() => navigate(`/chat/${encodeURIComponent(contact.email)}`)}
-                onMouseOver={e => e.currentTarget.style.background = '#f0f4ff'}
-                onMouseOut={e => e.currentTarget.style.background = '#fff'}
+                onClick={() => handleChatClick(contact.email)}
+                onMouseOver={e => e.currentTarget.style.background = '#333'}
+                onMouseOut={e => e.currentTarget.style.background = '#222'}
               >
                 {/* Avatar */}
                 <div style={{
@@ -125,13 +200,20 @@ export default function ChatsList(props) {
                 </div>
                 {/* Chat Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 18, color: '#222', marginBottom: 2, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{contact.uname}</div>
-                  <div style={{ color: '#888', fontSize: 14, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                    {lastMsg ? (lastMsg.content.length > 40 ? lastMsg.content.slice(0, 40) + '...' : lastMsg.content) : <span style={{ color: '#bbb' }}>No messages yet</span>}
+                  <div style={{ fontWeight: 600, fontSize: 18, color: '#bbb', marginBottom: 2, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{contact.uname}</div>
+                  <div style={{
+                    color: isUnread ? '#fff' : '#bbb',
+                    fontSize: isUnread ? 16 : 14,
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    fontWeight: isUnread ? 700 : 400
+                  }}>
+                    {lastMsg ? (lastMsg.content.length > 40 ? lastMsg.content.slice(0, 40) + '...' : lastMsg.content) : <span style={{ color: '#666' }}>No messages yet</span>}
                   </div>
                 </div>
                 {/* Last message time */}
-                <div style={{ color: '#aaa', fontSize: 12, marginLeft: 10, minWidth: 70, textAlign: 'right' }}>
+                <div style={{ color: '#bbb', fontSize: 12, marginLeft: 10, minWidth: 70, textAlign: 'right' }}>
                   {lastMsg && lastMsg.created_at ? new Date(lastMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                 </div>
               </div>
@@ -227,7 +309,7 @@ export default function ChatsList(props) {
                       }}>
                         {user.uname ? user.uname[0].toUpperCase() : '?'}
                       </div>
-                      <span style={{ fontWeight: 500, fontSize: 16 }}>{user.uname}</span>
+                      <span style={{ fontWeight: 500, fontSize: 16, color: '#111' }}>{user.uname}</span>
                       <span style={{ color: '#aaa', fontSize: 13, marginLeft: 8 }}>{user.email}</span>
                     </li>
                   ))}
