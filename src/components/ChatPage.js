@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useLayoutEffect } from 'react';
 import { io } from 'socket.io-client';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
@@ -21,6 +21,17 @@ const ChatPage = () => {
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const lastUpdateRef = useRef(Date.now());
+  // Ref for chat container
+  const chatContainerRef = useRef(null);
+  // Ref to track first load for auto-scroll
+  const firstLoadRef = useRef(true);
+
+  // Helper to check if user is at (or near) the bottom
+  function isAtBottom(ref, threshold = 100) {
+    if (!ref.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = ref.current;
+    return scrollHeight - scrollTop - clientHeight < threshold;
+  }
 
   // Fetch messages function
   const fetchMessages = useCallback(async () => {
@@ -228,10 +239,26 @@ const ChatPage = () => {
     markAsRead();
   }, [email, myEmail, token]);
 
-  // Auto-scroll to bottom
+  // Reset firstLoadRef when chat user changes
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    firstLoadRef.current = true;
+  }, [email]);
+
+  // Always scroll to bottom on first load, then only if user is at (or near) the bottom
+  useLayoutEffect(() => {
+    if (firstLoadRef.current) {
+      // On first load, always scroll to bottom
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+      }
+      firstLoadRef.current = false;
+    } else {
+      // On subsequent updates, only scroll if user is at (or near) the bottom
+      if (isAtBottom(chatContainerRef)) {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     }
   }, [messages]);
 
@@ -433,6 +460,7 @@ const ChatPage = () => {
       {/* Messages Area */}
       <div
         className="chat-messages"
+        ref={chatContainerRef}
         style={{
           border: '1px solid #ccc',
           flex: 1,
