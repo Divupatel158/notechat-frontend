@@ -374,7 +374,7 @@ const ChatPage = () => {
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
-        height: '100dvh', // Use dynamic viewport height for mobile
+        height: '100vh',
         boxSizing: 'border-box',
         position: 'relative',
         background: '#fff',
@@ -383,20 +383,19 @@ const ChatPage = () => {
     >
       <style>{chatStyles}</style>
       {/* Fixed Navbar */}
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000 }}>
+      <div style={{ position: 'sticky', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff' }}>
         <Navbar />
       </div>
       
       {/* Fixed Chat Header */}
       <div style={{
-        position: 'fixed',
-        top: 72,
-        left: 0,
+        position: 'sticky',
+        top: 56, // height of navbar
         width: '100vw',
         height: 80,
         background: '#3E5F44',
         borderBottom: '1px solid #ccc',
-        zIndex: 1001,
+        zIndex: 999,
         display: 'flex',
         alignItems: 'center',
         padding: '0 16px',
@@ -456,7 +455,7 @@ const ChatPage = () => {
         </button>
       </div>
       
-      <div style={{ height: 150, backgroundColor: '#3E5F44' }}></div>
+      {/* Remove spacer div for header, not needed with sticky */}
       
       {/* Messages Area */}
       <div
@@ -464,18 +463,16 @@ const ChatPage = () => {
         ref={chatContainerRef}
         style={{
           border: '1px solid #ccc',
+          flex: 1,
           overflowY: 'auto',
           padding: 10,
-          marginBottom: 10,
           background: '#93DA97',
           minHeight: 0,
-          marginTop: 131,
           paddingTop: 8,
           width: '100vw',
           boxSizing: 'border-box',
           overflowX: 'hidden',
-          height: 'calc(100dvh - 150px - 56px - 56px)', // 150px for header, 56px for navbar, 56px for input (approx)
-          maxHeight: 'calc(100dvh - 150px - 56px - 56px)'
+          marginBottom: 0
         }}
       >
         {messages.length === 0 ? (
@@ -556,7 +553,17 @@ const ChatPage = () => {
       </div>
       
       {/* Message Input */}
-      <form onSubmit={sendMessage} style={{ display: 'flex', padding: 8, width: '100vw', boxSizing: 'border-box', position: 'fixed', bottom: 0, left: 0, background: '#fff', zIndex: 1002 }}>
+      <form onSubmit={sendMessage} style={{
+        display: 'flex',
+        padding: 8,
+        width: '100vw',
+        boxSizing: 'border-box',
+        position: 'sticky',
+        bottom: 0,
+        background: '#fff',
+        zIndex: 1002,
+        margin: 0
+      }}>
         <input
           type="text"
           value={newMsg}
