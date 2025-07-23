@@ -142,9 +142,9 @@ export default function ChatsList(props) {
   };
 
   return (
-    <div style={{ maxWidth: 600,maxHeight:'80vh', margin: '0 auto', padding: 0, position: 'relative', background: palette.dark, minHeight: '50vh', color: palette.cream }}>
+    <div style={{ maxWidth: 600,maxHeight:'80vh', margin: '0 auto', padding: 0, position: 'relative', background: palette.dark, minHeight: '91vh', color: palette.cream }}>
       {/* Main content below navbar */}
-      <div style={{background: palette.dark, minHeight: '50vh', color: palette.cream }}>
+      <div style={{background: palette.dark, minHeight: '92vh', color: palette.cream }}>
         <h2 style={{ textAlign: 'center', padding: '20px 0', color: palette.beige, fontWeight: 700, letterSpacing: 1 }}>Your Chats</h2>
         <div style={{ padding: 0 }}>
           {contacts.length === 0 && <div style={{ textAlign: 'center', color: palette.beige, padding: 40 }}>No chats yet. Start a conversation!</div>}
