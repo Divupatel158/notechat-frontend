@@ -454,7 +454,7 @@ const ChatPage = () => {
       </div>
       
       {/* Messages Area */}
-      <div className="chat-messages" ref={chatContainerRef}>
+      <div className="chatpage-messages" ref={chatContainerRef}>
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
             No messages yet. Start a conversation!
