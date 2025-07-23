@@ -106,14 +106,7 @@ function Register(props) {
             <section className="vh-99 pb-4 pt-3">
                 <div className="container py-5 h-100">
                     <div className="row d-flex align-items-center justify-content-center h-100">
-                        <div className="col-12 col-md-8 col-lg-7 col-xl-6 mb-3 mb-md-0 d-flex justify-content-center">
-                            <img
-                                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-                                className="img-fluid register-img"
-                                alt="Phone"
-                                style={{ width: '100%', maxWidth: '350px', height: 'auto' }}
-                            />
-                        </div>
+                        
                         <div className="col-12 col-md-7 col-lg-5 col-xl-5 offset-xl-1">
                             <p className="text-center h1 fw-bold mb-4 mx-1 mx-md-4 mt-2" style={{ lineHeight: 1 }}>Sign up</p>
                             <form onSubmit={hendalSubmit}>
@@ -172,6 +165,14 @@ function Register(props) {
                                     <p className="text-center fw-bold mx-3 mb-0 text-muted">Already a member? <NavLink to="/login">Login</NavLink></p>
                                 </div>
                             </form>
+                        </div>
+                        <div className="col-12 col-md-8 col-lg-7 col-xl-6 mb-3 mb-md-0 d-flex justify-content-center">
+                            <img
+                                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
+                                className="img-fluid register-img"
+                                alt="Phone"
+                                style={{ width: '100%', maxWidth: '350px', height: 'auto' }}
+                            />
                         </div>
                     </div>
                 </div>
