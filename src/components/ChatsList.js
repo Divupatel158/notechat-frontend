@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
+import palette from '../colors';
 
 const avatarColors = [
-  '#6C63FF', '#FF6584', '#43E97B', '#F9D423', '#FFB347', '#36D1C4', '#FF6B6B', '#FFD166', '#06D6A0', '#118AB2'
+  palette.orange, palette.brown, palette.gray, palette.beige, palette.dark, palette.cream
 ];
 
 function getAvatarColor(name) {
@@ -124,7 +124,7 @@ export default function ChatsList(props) {
       localStorage.setItem(`chat_read_${email}`, lastMsg.id);
     }
     setUnreadChats((prev) => prev.filter(e => e !== email));
-    navigate(`/chat/${encodeURIComponent(email)}`);
+    navigate(`/chats/${encodeURIComponent(email)}`);
   };
 
   // Fetch all users for new chat modal
@@ -142,16 +142,12 @@ export default function ChatsList(props) {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 0, position: 'relative', background: '#111', minHeight: '100vh', color: '#bbb' }}>
-      {/* Fixed Navbar */}
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000 }}>
-        <Navbar />
-      </div>
+    <div style={{ maxWidth: 600,maxHeight:'80vh', margin: '0 auto', padding: 0, position: 'relative', background: palette.dark, minHeight: '50vh', color: palette.cream }}>
       {/* Main content below navbar */}
-      <div style={{ marginTop: 56, background: '#111', minHeight: '100vh', color: '#fff' }}>
-        <h2 style={{ textAlign: 'center', padding: '20px 0', color: '#bbb', fontWeight: 700, letterSpacing: 1 }}>Your Chats</h2>
+      <div style={{background: palette.dark, minHeight: '50vh', color: palette.cream }}>
+        <h2 style={{ textAlign: 'center', padding: '20px 0', color: palette.beige, fontWeight: 700, letterSpacing: 1 }}>Your Chats</h2>
         <div style={{ padding: 0 }}>
-          {contacts.length === 0 && <div style={{ textAlign: 'center', color: '#bbb', padding: 40 }}>No chats yet. Start a conversation!</div>}
+          {contacts.length === 0 && <div style={{ textAlign: 'center', color: palette.beige, padding: 40 }}>No chats yet. Start a conversation!</div>}
           {contacts.map((contact, idx) => {
             const lastMsg = lastMessages[contact.email];
             // Robust unread logic: compare last message ID to last read
@@ -166,14 +162,14 @@ export default function ChatsList(props) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  background: '#222',
+                  background: palette.gray,
                   borderRadius: 12,
                   margin: '12px 16px',
                   padding: '14px 18px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                  boxShadow: `0 1px 4px ${palette.brown}22`,
                   cursor: 'pointer',
                   transition: 'background 0.2s',
-                  border: '1px solid #222',
+                  border: `1px solid ${palette.brown}`,
                   position: 'relative',
                   minHeight: 64
                 }}
@@ -190,19 +186,19 @@ export default function ChatsList(props) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
+                  color: palette.cream,
                   fontWeight: 700,
                   fontSize: 22,
                   marginRight: 18,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.07)'
+                  boxShadow: `0 2px 8px ${palette.brown}33`
                 }}>
                   {contact.uname ? contact.uname[0].toUpperCase() : '?'}
                 </div>
                 {/* Chat Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 18, color: '#bbb', marginBottom: 2, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{contact.uname}</div>
+                  <div style={{ fontWeight: 600, fontSize: 18, color: palette.beige, marginBottom: 2, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{contact.uname}</div>
                   <div style={{
-                    color: isUnread ? '#fff' : '#bbb',
+                    color: isUnread ? palette.cream : palette.beige,
                     fontSize: isUnread ? 16 : 14,
                     textOverflow: 'ellipsis',
                     overflow: 'hidden',
@@ -213,7 +209,7 @@ export default function ChatsList(props) {
                   </div>
                 </div>
                 {/* Last message time */}
-                <div style={{ color: '#bbb', fontSize: 12, marginLeft: 10, minWidth: 70, textAlign: 'right' }}>
+                <div style={{ color: palette.beige, fontSize: 12, marginLeft: 10, minWidth: 70, textAlign: 'right' }}>
                   {lastMsg && lastMsg.created_at ? new Date(lastMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                 </div>
               </div>
@@ -225,15 +221,15 @@ export default function ChatsList(props) {
           onClick={handleNewChatClick}
           style={{
             position: 'fixed',
-            right: 40,
+            left: 20,
             bottom: 40,
             width: 60,
             height: 60,
             borderRadius: '50%',
-            background: '#6C63FF',
-            color: '#fff',
+            background: palette.orange,
+            color: palette.cream,
             border: 'none',
-            boxShadow: '0 4px 16px rgba(108,99,255,0.18)',
+            boxShadow: `0 4px 16px ${palette.brown}33`,
             fontSize: 32,
             display: 'flex',
             alignItems: 'center',
@@ -291,7 +287,7 @@ export default function ChatsList(props) {
                       }}
                       onClick={() => {
                         setShowModal(false);
-                        navigate(`/chat/${encodeURIComponent(user.email)}`);
+                        navigate(`/chats/${encodeURIComponent(user.email)}`);
                       }}
                     >
                       <div style={{
@@ -302,7 +298,7 @@ export default function ChatsList(props) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#fff',
+                        color: palette.cream,
                         fontWeight: 700,
                         fontSize: 18,
                         marginRight: 14,

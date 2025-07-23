@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback, useLayoutEffect } from 'react';
 import { io } from 'socket.io-client';
 import { useParams, useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
+import NavBar from './Navbar';
+
 
 const API_BASE = 'https://notechat-backend-production.up.railway.app';
 
@@ -330,28 +331,29 @@ const ChatPage = () => {
     width: 0;
     height: 0;
   }
-  .chat-bubble.bg-white:before {
+  .chat-bubble.bubble-r-color:before {
     left: -8px;
     top: 10px;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
     border-right: 8px solid white;
   }
-  .chat-bubble.bg-primary:before {
+  .chat-bubble.bubble-s-color:before {
     right: -8px;
     top: 10px;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
-    border-left: 8px solid #0d6efd;
+    border-left: 8px solid rgba(183, 204, 235, 0.45);
   }
+  .bubble-s-color{ background :rgba(183, 204, 235, 0.45)}
   .chat-messages::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
   .chat-messages::-webkit-scrollbar-track {
     background: #f1f1f1;
   }
   .chat-messages::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: #111;
     border-radius: 3px;
   }
   .chat-messages::-webkit-scrollbar-thumb:hover {
@@ -367,14 +369,15 @@ const ChatPage = () => {
 
   return (
     <div
+      key={email}
       className="chat-page-container"
       style={{
-        width: '100vw',
+        width: '100%',
+        height: '100vh',
         margin: 0,
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
         boxSizing: 'border-box',
         position: 'relative',
         background: '#fff',
@@ -382,18 +385,13 @@ const ChatPage = () => {
       }}
     >
       <style>{chatStyles}</style>
-      {/* Fixed Navbar */}
-      <div style={{ position: 'sticky', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff' }}>
-        <Navbar />
-      </div>
-      
       {/* Fixed Chat Header */}
       <div style={{
         position: 'sticky',
-        top: 56, // height of navbar
-        width: '100vw',
-        height: 80,
-        background: '#3E5F44',
+        top: 70,
+        width: '100%',
+        height: 85,
+        background: '#000',
         borderBottom: '1px solid #ccc',
         zIndex: 999,
         display: 'flex',
@@ -419,7 +417,7 @@ const ChatPage = () => {
           }}
           title="Back to Chats"
         >
-          &#8592;
+          <i className="fas fa-arrow-left" style={{ color: '#fff' }}></i>
         </button>
         <div className="avatar" style={{ marginRight: 12 }}>
           <img src="/media/dp.jpg" alt="Profile" style={{ width: 50, height: 50, borderRadius: '50%' }} />
@@ -455,26 +453,8 @@ const ChatPage = () => {
         </button>
       </div>
       
-      {/* Remove spacer div for header, not needed with sticky */}
-      
       {/* Messages Area */}
-      <div
-        className="chat-messages"
-        ref={chatContainerRef}
-        style={{
-          border: '1px solid #ccc',
-          flex: 1,
-          overflowY: 'auto',
-          padding: 10,
-          background: '#93DA97',
-          minHeight: 0,
-          paddingTop: 8,
-          width: '100vw',
-          boxSizing: 'border-box',
-          overflowX: 'hidden',
-          marginBottom: 0
-        }}
-      >
+      <div className="chat-messages" ref={chatContainerRef}>
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
             No messages yet. Start a conversation!
@@ -493,8 +473,8 @@ const ChatPage = () => {
               className={
                 'chat-bubble ' +
                   (msg.sender?.email === myEmail
-                  ? 'bg-primary text-white'
-                  : 'bg-white') +
+                  ? ' bubble-s-color text-white'
+                  : 'bubble-r-color text-white') +
                 ' p-3 rounded shadow-sm'
               }
                 style={{ 
@@ -556,11 +536,11 @@ const ChatPage = () => {
       <form onSubmit={sendMessage} style={{
         display: 'flex',
         padding: 8,
-        width: '100vw',
+        width: '100%',
         boxSizing: 'border-box',
         position: 'sticky',
         bottom: 0,
-        background: '#fff',
+        background: '#000',
         zIndex: 1002,
         margin: 0
       }}>
@@ -595,6 +575,8 @@ const ChatPage = () => {
             flex: 1, 
             padding: 8, 
             paddingLeft: '15px', 
+            background: '#000',
+            color:'#fff',
             border: '1px solid gray', 
             borderTopLeftRadius: '50px', 
             borderBottomLeftRadius: '50px',
@@ -627,18 +609,7 @@ const ChatPage = () => {
         </button>
       </form>
       
-      <style>{`
-        html, body, #root {
-          width: 100vw !important;
-          overflow-x: hidden !important;
-        }
-        .chat-page-container, .chat-messages {
-          width: 100vw !important;
-          max-width: 100vw !important;
-          margin: 0 !important;
-          overflow-x: hidden !important;
-        }
-      `}</style>
+      {/* Remove global style overrides for width/overflow */}
     </div>
   );
 };

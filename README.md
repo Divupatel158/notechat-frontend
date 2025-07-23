@@ -1,4 +1,5 @@
 # Getting Started with Create React App
+this is color pallate of entaire web page (https://i.pinimg.com/1200x/d1/6e/3b/d16e3b1973631fcd0e2b6c32aef0bb0e.jpg)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
