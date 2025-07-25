@@ -58,9 +58,9 @@ function NavBar(props) {
           <div className="collapse navbar-collapse " id="navbarNav">
             {localStorage.getItem('token') ?(
                 <ul className="navbar-nav ms-auto d-flex align-items-center">
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <NavLink className={`btn btn-secondary mx-2 my-2 p-2`} onClick={handleDelete} >Delete Account</NavLink>
-                  </li>
+                  </li> */}
                   <li className="nav-item">
                     <NavLink className={`btn btn-secondary mx-2 my-2 p-2`} onClick={handleLogout} >Logout</NavLink>
                   </li>
